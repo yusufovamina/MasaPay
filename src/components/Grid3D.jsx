@@ -7,9 +7,9 @@ export default function Grid3D() {
     const [hovered, setHovered] = useState(null);
     const { viewport } = useThree();
 
-      const gridSize = useMemo(() => {
+    const gridSize = useMemo(() => {
         const aspect = viewport.width / viewport.height;
-       
+
         const baseX = Math.floor(aspect * 35);
         const baseY = Math.floor(50 / aspect);
         return { x: baseX, y: baseY };
@@ -65,17 +65,18 @@ export default function Grid3D() {
             // Apply elevation
             mesh.position.z = cell.position[2] + wave + cell.elevation;
 
-           
+
             mesh.rotation.x = cell.rotation * 0.1;
             mesh.rotation.y = cell.rotation * 0.1;
 
             const cubeMesh = mesh.children[0];
             if (cubeMesh && cubeMesh.material) {
-                const hoverInfluence = cell.brightness / 0.8; // Normalize to 0-1
+                const hoverInfluence = cell.brightness / 0.8;
+                // #558157 color: R=0.333, G=0.506, B=0.341
                 cubeMesh.material.emissive.setRGB(
-                    cell.brightness * 0.2 + hoverInfluence * 0.1, // Slight red
-                    cell.brightness * 0.3 + hoverInfluence * 0.2, // More green
-                    cell.brightness * 0.3 + hoverInfluence * 0.3  // Most blue (cyan)
+                    cell.brightness * 0.2 + hoverInfluence * 0.333,
+                    cell.brightness * 0.3 + hoverInfluence * 0.506,
+                    cell.brightness * 0.2 + hoverInfluence * 0.341
                 );
                 cubeMesh.material.emissiveIntensity = 0.15 + cell.brightness;
             }
@@ -135,7 +136,7 @@ export default function Grid3D() {
 
     const handlePointerLeave = () => {
         setHovered(null);
-       
+
         cells.forEach((cell) => {
             cell.targetElevation = 0;
             cell.targetBrightness = 0;
@@ -147,7 +148,7 @@ export default function Grid3D() {
         <>
             <ambientLight intensity={0.4} />
             <directionalLight position={[10, 10, 5]} intensity={0.6} />
-            <pointLight position={[0, 0, 15]} intensity={0.6} color="#00D4FF" />
+            <pointLight position={[0, 0, 15]} intensity={0.6} color="#558157" />
             <pointLight position={[-10, -10, 10]} intensity={0.3} color="#ffffff" />
 
             <group
@@ -170,7 +171,7 @@ export default function Grid3D() {
                             />
                         </mesh>
 
-                                <lineSegments>
+                        <lineSegments>
                             <edgesGeometry args={[new THREE.BoxGeometry(cellSize, cellSize, cellSize)]} />
                             <lineBasicMaterial color="#ffffff" opacity={0.5} transparent />
                         </lineSegments>
