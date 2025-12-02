@@ -8,13 +8,11 @@ function App() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Trigger animation after component mounts
     setTimeout(() => setIsVisible(true), 150);
   }, []);
 
   return (
     <div className="app">
-      {/* 3D Canvas Background */}
       <div className="canvas-container">
         <Canvas>
           <PerspectiveCamera makeDefault position={[0, 0, 18]} fov={70} />
@@ -22,7 +20,6 @@ function App() {
         </Canvas>
       </div>
 
-      {/* Text Content Overlay */}
       <div className="content-overlay">
         <main className="content">
           <h1 className={`title ${isVisible ? 'visible' : ''}`}>
@@ -32,6 +29,14 @@ function App() {
             Coming Soon
           </p>
         </main>
+
+        <footer className={`footer ${isVisible ? 'visible' : ''}`}>
+          <div className="footer-content">
+            <p className="footer-company">© 2025 "MASAPAY" MMC</p>
+            <p className="footer-voen">VÖEN: 1309734061</p>
+            <p className="footer-rights">All rights reserved</p>
+          </div>
+        </footer>
       </div>
     </div>
   );

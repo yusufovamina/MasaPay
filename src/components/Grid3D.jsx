@@ -18,7 +18,6 @@ export default function Grid3D() {
     const cellSize = 0.8;
     const spacing = 1.0;
 
-    // Create grid of cells with individual refs for animation
     const cells = useMemo(() => {
         const temp = [];
         for (let x = 0; x < gridSize.x; x++) {
@@ -43,40 +42,33 @@ export default function Grid3D() {
         return temp;
     }, [gridSize.x, gridSize.y]);
 
-    // Animation loop
     useFrame((state) => {
         if (!gridRef.current) return;
 
         const time = state.clock.getElapsedTime();
 
-        // Gentle wave animation
         cells.forEach((cell, i) => {
             const mesh = gridRef.current.children[i];
             if (!mesh) return;
 
-            // Smooth interpolation for hover effect (spring-like)
             cell.elevation += (cell.targetElevation - cell.elevation) * 0.15;
             cell.brightness += (cell.targetBrightness - cell.brightness) * 0.15;
             cell.rotation += (cell.targetRotation - cell.rotation) * 0.1;
 
-            // Base wave animation
             const wave = Math.sin(time * 0.5 + cell.offset) * 0.05;
 
-            // Apply elevation
             mesh.position.z = cell.position[2] + wave + cell.elevation;
-
-
             mesh.rotation.x = cell.rotation * 0.1;
             mesh.rotation.y = cell.rotation * 0.1;
 
             const cubeMesh = mesh.children[0];
             if (cubeMesh && cubeMesh.material) {
                 const hoverInfluence = cell.brightness / 0.8;
-                // #558157 color: R=0.333, G=0.506, B=0.341
+                // #1D8653 color: R=0.114, G=0.525, B=0.325
                 cubeMesh.material.emissive.setRGB(
-                    cell.brightness * 0.2 + hoverInfluence * 0.333,
-                    cell.brightness * 0.3 + hoverInfluence * 0.506,
-                    cell.brightness * 0.2 + hoverInfluence * 0.341
+                    cell.brightness * 0.2 + hoverInfluence * 0.114,
+                    cell.brightness * 0.3 + hoverInfluence * 0.525,
+                    cell.brightness * 0.2 + hoverInfluence * 0.325
                 );
                 cubeMesh.material.emissiveIntensity = 0.15 + cell.brightness;
             }
@@ -88,14 +80,11 @@ export default function Grid3D() {
         });
     });
 
-    // Handle mouse move
     const handlePointerMove = (event) => {
         event.stopPropagation();
 
-        // Get intersection point
         const point = event.point;
 
-        // Find closest cell
         let closestCell = null;
         let minDist = Infinity;
 
@@ -113,18 +102,16 @@ export default function Grid3D() {
         if (closestCell && closestCell.id !== hovered) {
             setHovered(closestCell.id);
 
-            // Apply hover effect to hovered cell and neighbors (ripple)
             cells.forEach((cell) => {
                 const dx = cell.position[0] - closestCell.position[0];
                 const dy = cell.position[1] - closestCell.position[1];
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
                 if (dist < spacing * 2.5) {
-                    // Falloff effect with larger radius
                     const influence = Math.max(0, 1 - dist / (spacing * 2.5));
-                    cell.targetElevation = influence * 2.0; // Increased from 1.5
+                    cell.targetElevation = influence * 2.0;
                     cell.targetBrightness = influence * 0.8;
-                    cell.targetRotation = influence * 0.5; // Add rotation
+                    cell.targetRotation = influence * 0.5;
                 } else {
                     cell.targetElevation = 0;
                     cell.targetBrightness = 0;
@@ -148,7 +135,7 @@ export default function Grid3D() {
         <>
             <ambientLight intensity={0.4} />
             <directionalLight position={[10, 10, 5]} intensity={0.6} />
-            <pointLight position={[0, 0, 15]} intensity={0.6} color="#558157" />
+            <pointLight position={[0, 0, 15]} intensity={0.6} color="#1D8653" />
             <pointLight position={[-10, -10, 10]} intensity={0.3} color="#ffffff" />
 
             <group
@@ -158,7 +145,6 @@ export default function Grid3D() {
             >
                 {cells.map((cell) => (
                     <group key={cell.id} position={cell.position}>
-                        {/* Cubic cell mesh */}
                         <mesh>
                             <boxGeometry args={[cellSize, cellSize, cellSize]} />
                             <meshStandardMaterial
